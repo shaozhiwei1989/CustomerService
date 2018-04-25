@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ultra.cs.dao.CustomerDao">
+	<resultMap type="com.ultra.cs.model.CustomerConfig" id="Base_Result_Map">
+		<id column="id_" property="id"/>
+		<result column="system_" property="system"/>
+		<result column="type_" property="type"/>
+		<result column="current_account_" property="currentAccount"/>
+	</resultMap>
+	
+	<resultMap type="com.ultra.cs.model.CustomerConfig" id="Customer_Result_Map" extends="Base_Result_Map">
+		<collection  property="accounts" ofType="com.ultra.cs.model.CusAccountConfig" javaType="java.util.List" column="{cusConfigId=id_}"  select="listCusAccountConfig" />
+	</resultMap>
+	
+	<resultMap type="com.ultra.cs.model.CusAccountConfig" id="CusAccount_Config_Map">
+		<id column="id_" property="id"/>
+		<result column="account_" property="account"/>
+		<result column="name_" property="name"/>
+		<result column="cus_config_id_" property="cusConfigId"/>
+	</resultMap>
+
+	<insert id="insert" parameterType="com.ultra.cs.model.CustomerConfig" keyColumn="id_" keyProperty="id" useGeneratedKeys="true">
+		insert into cs_customer_config(
+			system_,
+			type_
+		)values(
+			#{system},
+			#{type}
+		)
+	</insert>
+
+	<delete id="delete" parameterType="long">
+		delete t from cs_customer_config t where t.id_=#{id}
+	</delete>
+	
+	<update id="update" parameterType="com.ultra.cs.model.CustomerConfig">
+		update cs_customer_config t 
+			set t.system_=#{system} 
+				t.type_=#{type}
+		  where t.id_=#{id}
+	</update>
+	
+	<select id="findCustomerConfig" parameterType="java.util.Map" resultMap="Customer_Result_Map">
+		select t.id_,
+			   t.system_,
+			   t.type_,
+			   t.current_account_  
+			from cs_customer_config t  
+		  where t.system_=#{system} 
+			and t.type_=#{type}
+	</select>
+	
+	<select id="listCustomerConfig" parameterType="map" resultMap="Base_Result_Map">
+		select t.id_,
+			   t.system_,
+			   t.type_,
+			   t.current_account_  
+		from cs_customer_config t 
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="getCustomerConfigTotal" parameterType="map" resultType="int">
+		select count(*) from cs_customer_config
+	</select>
+	
+	<update id="updateCurrentAccount" parameterType="com.ultra.cs.model.CustomerConfig">
+		update cs_customer_config t 
+			set t.current_account_=#{currentAccount} 
+		  where t.id_=#{id}
+	</update>
+	
+	<insert id="insertCusAccountConfig" parameterType="com.ultra.cs.model.CusAccountConfig" keyColumn="id_" keyProperty="id" useGeneratedKeys="true">
+		insert into cs_cusaccount_config(
+			account_,
+			name_,
+			cus_config_id_
+		)values(
+			#{account},
+			#{name},
+			#{cusConfigId}
+		)
+	</insert>
+	
+	<update id="updateCusAccountConfigById" parameterType="com.ultra.cs.model.CusAccountConfig">
+		update cs_cusaccount_config t
+			set t.account_=#{account},
+				t.name_=#{name}
+		  where t.id_=#{id}
+	</update>
+	
+	<delete id="deleteCusAccountConfigById" parameterType="long">
+		delete t from cs_cusaccount_config t where t.id_=#{id}
+	</delete>
+	
+	<delete id="deleteCusAccountConfigByCusConfigId" parameterType="long">
+		delete t from cs_cusaccount_config t where t.cus_config_id_=#{cusConfigId}
+	</delete>
+	
+	<select id="listCusAccountConfig" parameterType="map" resultMap="CusAccount_Config_Map">
+		select t.id_,
+			   t.account_,
+			   t.name_,
+			   t.cus_config_id_
+		from cs_cusaccount_config t
+		<where>
+			<if test="cusConfigId !=null and cusConfigId !='' ">and t.cus_config_id_=#{cusConfigId}</if>
+			<if test="account !=null and account !='' ">and t.account_=#{account}</if>
+		</where>	
+		<if test="offset !=null and limit !=null">
+			limit #{offset},#{limit}
+		</if>
+	</select>
+	
+	<select id="getCusAccountConfigTotal" parameterType="map" resultType="int">
+		select count(*) from cs_cusaccount_config t 
+		<where>
+			<if test="cusConfigId !=null and cusConfigId !='' ">and t.cus_config_id_=#{cusConfigId}</if>
+			<if test="account !=null and account !='' ">and t.account_=#{account}</if>
+		</where>	
+	</select>
+</mapper>

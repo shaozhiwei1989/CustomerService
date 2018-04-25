@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ultra.cs.dao.TypeConfigDao">
+	<resultMap type="com.ultra.cs.model.TypeConfig" id="Base_Result_Map">
+		<id column="id_" property="id"/>
+		<result column="name_" property="name"/>
+		<result column="order_" property="order"/>
+	</resultMap>
+
+	<insert id="insert" parameterType="com.ultra.cs.model.TypeConfig" useGeneratedKeys="true" keyProperty="id" keyColumn="id_" >
+		insert into cs_type_config(
+			name_,
+			order_
+		)values(
+			#{name},
+			#{order}
+		)
+	</insert>
+	
+	<update id="update" parameterType="com.ultra.cs.model.TypeConfig" >
+		update cs_type_config t
+			set t.name_=#{name},
+				t.order_=#{order}
+		  where t.id_=#{id}
+	</update>
+	
+	<delete id="delete" parameterType="long">
+		delete t from cs_type_config t where t.id_=#{id}
+	</delete>
+	
+	<select id="listType" resultMap="Base_Result_Map" >
+		select t.id_,
+			   t.name_,
+			   t.order_
+			from cs_type_config t
+		  order by t.order_ asc
+	</select>
+	
+</mapper>

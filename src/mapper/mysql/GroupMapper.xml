@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ultra.im.dao.GroupDao">
+	<resultMap type="com.ultra.im.model.Group" id="Group_Result_Map">
+		<id property="id" column="id_"/>
+		<result property="name" column="name_"/>
+		<result property="groupHolder" column="group_holder_"/>
+		<result property="headPortraitUrl" column="head_portrait_url_"/>
+		<result property="isCsGroup" column="is_cs_group_"/>
+		<result property="createTime" column="create_time_"/>
+	</resultMap>
+	
+	<insert id="insert" parameterType="com.ultra.im.model.Group" keyColumn="id_" keyProperty="id" useGeneratedKeys="true">
+		<selectKey keyProperty="id" resultType="string" order="BEFORE">
+			<choose>
+				<when test="isCsGroup = true">
+					select concat('CS_',upper(replace(uuid(),'-',''))) from dual 
+				</when>
+				<otherwise>
+					select  upper(replace(uuid(),'-','')) from dual 
+				</otherwise>
+			</choose>  
+	    </selectKey>
+		insert into cs_im_group(
+			id_,
+			name_,
+			group_holder_,
+			head_portrait_url_,
+			is_cs_group_,
+			create_time_
+		)values(
+			#{id},
+			#{name},
+			#{groupHolder},
+			#{headPortraitUrl},
+			#{isCsGroup},
+			#{createTime}
+		)
+	</insert>
+	
+	<delete id="delete" parameterType="string">
+		delete t from cs_im_group t where t.id_=#{id}
+	</delete>
+	
+	<select id="find" parameterType="string" resultMap="Group_Result_Map">
+		select t.id_,
+			   t.name_,
+			   t.group_holder_,
+			   t.head_portrait_url_,
+			   t.is_cs_group_,
+			   t.create_time_
+			from cs_im_group t
+		  where t.id_=#{id}
+	</select>
+	
+	<update id="update" parameterType="com.ultra.im.model.Group">
+		update cs_im_group t
+		<set>
+			<if test="name !=null and name !='' ">t.name_=#{name},</if>
+			<if test="groupHolder !=null and groupHolder !='' ">t.group_holder_=#{groupHolder},</if>
+			<if test="headPortraitUrl !=null and headPortraitUrl !='' ">t.head_portrait_url_=#{headPortraitUrl}</if>
+		</set>
+		where t.id_=#{id}
+	</update>
+	
+</mapper>
