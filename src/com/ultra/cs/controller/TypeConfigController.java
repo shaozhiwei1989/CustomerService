@@ -6,7 +6,10 @@
  */
 package com.ultra.cs.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.ultra.cs.model.SystemConfig;
 import com.ultra.cs.model.TypeConfig;
 import com.ultra.cs.service.TypeConfigService;
 import com.ultra.vo.PageData;
@@ -46,9 +48,11 @@ public class TypeConfigController {
     @Autowired
     private TypeConfigService typeConfigService;
 
+    AtomicLong id = new AtomicLong(0);
+
     @ResponseBody
     @RequestMapping(value = "/add", method = RequestMethod.POST)
-    public RespData<String> add(@RequestBody SystemConfig config) {
+    public RespData<String> add(@RequestBody TypeConfig config) {
         try {
             typeConfigService.insert(config);
             return new RespData<String>(200, "添加成功!", "添加成功!");
@@ -60,7 +64,7 @@ public class TypeConfigController {
 
     @ResponseBody
     @RequestMapping(value = "/modify", method = RequestMethod.POST)
-    public RespData<String> modify(@RequestBody SystemConfig config) {
+    public RespData<String> modify(@RequestBody TypeConfig config) {
         try {
             typeConfigService.update(config);
             return new RespData<String>(200, "修改成功!", "修改成功!");
@@ -86,11 +90,30 @@ public class TypeConfigController {
     @RequestMapping("/list")
     public PageData<TypeConfig> list() {
         try {
-            List<TypeConfig> types = typeConfigService.listType();
+            Map<String, Object> params = new HashMap<>();
+            params.put("id", 5L);
+            List<TypeConfig> types = typeConfigService.list(params);
             return new PageData<TypeConfig>(200, types, -1, -1);
         } catch (Exception e) {
             e.printStackTrace();
             return new PageData<TypeConfig>(500, e.getMessage(), null, -1, -1);
         }
     }
+
+    @ResponseBody
+    @RequestMapping("/test")
+    public RespData<TypeConfig> test() {
+        try {
+            TypeConfig config = new TypeConfig();
+            config.setId(id.incrementAndGet());
+            config.setName("name:" + config.getId());
+            config.setOrder(1);
+            typeConfigService.insert(config);
+            return new RespData<TypeConfig>(200, config);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new RespData<>(500, e.getMessage(), null);
+        }
+    }
+
 }

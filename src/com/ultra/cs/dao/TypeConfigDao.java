@@ -7,8 +7,10 @@
 package com.ultra.cs.dao;
 
 import java.util.List;
+import java.util.Map;
 
-import com.ultra.cs.model.SystemConfig;
+import org.apache.ibatis.annotations.Param;
+
 import com.ultra.cs.model.TypeConfig;
 
 /**
@@ -35,23 +37,23 @@ public interface TypeConfigDao {
      * 添加
      * @param config
      */
-    public void insert(SystemConfig config);
+    public void insert(TypeConfig config);
 
     /**
      * 更新
      * @param config
      */
-    public void update(SystemConfig config);
+    public void update(TypeConfig config);
 
     /**
      * 删除
      * @param id
      */
-    public void delete(Long id);
+    public void delete(@Param("id") Long id, @Param("name") String name);
 
     /**
      * 查询类别
      * @return
      */
-    public List<TypeConfig> listType();
+    public List<TypeConfig> listType(Map<String, Object> params);
 }

@@ -7,32 +7,34 @@
 		<result column="order_" property="order"/>
 	</resultMap>
 
-	<insert id="insert" parameterType="com.ultra.cs.model.TypeConfig" useGeneratedKeys="true" keyProperty="id" keyColumn="id_" >
-		insert into cs_type_config(
+	<insert id="insert" parameterType="com.ultra.cs.model.TypeConfig" >
+		insert into ##cs_type_config##(
+		    id_,
 			name_,
 			order_
 		)values(
+		    #{id},
 			#{name},
 			#{order}
 		)
 	</insert>
 	
 	<update id="update" parameterType="com.ultra.cs.model.TypeConfig" >
-		update cs_type_config t
+		update ##cs_type_config## t
 			set t.name_=#{name},
 				t.order_=#{order}
 		  where t.id_=#{id}
 	</update>
 	
-	<delete id="delete" parameterType="long">
-		delete t from cs_type_config t where t.id_=#{id}
+	<delete id="delete" >
+		delete t from ##cs_type_config## t where t.id_=#{id} and t.name_=#{name}
 	</delete>
 	
-	<select id="listType" resultMap="Base_Result_Map" >
+	<select id="listType" resultMap="Base_Result_Map" parameterType="map">
 		select t.id_,
 			   t.name_,
 			   t.order_
-			from cs_type_config t
+			from ##cs_type_config## t
 		  order by t.order_ asc
 	</select>
 	

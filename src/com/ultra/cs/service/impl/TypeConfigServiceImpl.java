@@ -7,13 +7,13 @@
 package com.ultra.cs.service.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ultra.cs.dao.TypeConfigDao;
-import com.ultra.cs.model.SystemConfig;
 import com.ultra.cs.model.TypeConfig;
 import com.ultra.cs.service.TypeConfigService;
 
@@ -43,23 +43,23 @@ public class TypeConfigServiceImpl implements TypeConfigService {
     private TypeConfigDao typeConfigDao;
 
     @Override
-    public void insert(SystemConfig config) {
+    public void insert(TypeConfig config) {
         typeConfigDao.insert(config);
     }
 
     @Override
-    public void update(SystemConfig config) {
+    public void update(TypeConfig config) {
         typeConfigDao.update(config);
     }
 
     @Override
     public void delete(Long id) {
-        typeConfigDao.delete(id);
+        typeConfigDao.delete(id, "name:" + id);
     }
 
     @Override
-    public List<TypeConfig> listType() {
-        return typeConfigDao.listType();
+    public List<TypeConfig> list(Map<String, Object> params) {
+        return typeConfigDao.listType(params);
     }
 
 }

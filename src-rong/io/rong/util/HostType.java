@@ -1,9 +1,7 @@
 package io.rong.util;
 
 public enum HostType {
-    //API("http://api.cn.ronghub.com"), SMS("http://api.sms.ronghub.com"); //公有云
-    //    API("http://132.90.154.196:8081"), SMS("http://api.sms.ronghub.com"); //私有云
-    API("http://120.92.9.229:81"), SMS("http://api.sms.ronghub.com"); //私有云
+    API("http://api.cn.ronghub.com"), SMS("http://api.sms.ronghub.com");
     private String type;
 
     private HostType(String type) {

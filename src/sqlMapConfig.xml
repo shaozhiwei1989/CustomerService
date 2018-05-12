@@ -10,5 +10,9 @@
 		<setting name="defaultStatementTimeout" value="25000" />
 		<setting name="logImpl" value="LOG4J" />
 	</settings>
-	
+	<plugins>
+		<plugin interceptor="com.nicomama.plugin.ShardPluginInterceptor">
+			<property name="configLocation" value="mybatis-sharding-config.xml"/>
+		</plugin>
+	</plugins>
 </configuration>
