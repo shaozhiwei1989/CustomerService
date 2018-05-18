@@ -42,7 +42,7 @@
     </bean>
 	
 	
-	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+	<bean id="dataSource_0" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
 		<property name="driverClassName" value="${jdbc.driver}" />
 		<!-- 设置JDBC连接URL -->
 		<property name="url" value="${jdbc.url}" />
@@ -83,15 +83,68 @@
         </property>
 	</bean>
 	
+	
+	<bean id="dataSource_1" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+		<property name="driverClassName" value="${jdbc2.driver}" />
+		<!-- 设置JDBC连接URL -->
+		<property name="url" value="${jdbc2.url}" />
+	
+		<!-- 设置数据库用户名 -->
+		<property name="username" value="${jdbc2.username}" />
+		<!-- 设置数据库密码 -->
+		<property name="password" value="${jdbc2.password}" />
+
+		<!-- 初始化时获取的连接数，取值应在minPoolSize与maxPoolSize之间。Default: 3 -->
+		<property name="initialSize" value="${jdbc2.initialSize}" />
+
+		<!-- 连接池中保留的最小连接数 -->
+		<property name="minIdle" value="${jdbc2.minIdle}" />
+
+		<!-- 连接池中保留的最大连接数。Default: 15 -->
+		<property name="maxActive" value="${jdbc2.maxActive}" />
+
+		<!-- 最大空闲时间,36000秒(10小时)内未使用则连接被丢弃。若为0则永不丢弃。Default: 0 -->
+		<property name="timeBetweenEvictionRunsMillis" value="${jdbc2.timeBetweenEvictionRunsMillis}" />
+		<property name="minEvictableIdleTimeMillis" value="${jdbc2.minEvictableIdleTimeMillis}" />
+		<property name="validationQuery" value="SELECT 1" />
+		<property name="testWhileIdle" value="true" />
+		
+		<property name="poolPreparedStatements" value="true" />
+		<property name="removeAbandoned" value="true" />
+        <!-- 超时时间；单位为秒。180秒=3分钟 -->
+        <property name="removeAbandonedTimeout" value="${jdbc.removeAbandonedTimeout}" />
+        <!-- 关闭abanded连接时输出错误日志 -->
+        <property name="logAbandoned" value="true" />
+	    
+        <property name="proxyFilters">
+            <list>
+                <ref bean="stat-filter" />
+                <ref bean="wall-filter" />
+                <ref bean="log-filter" />
+            </list>
+        </property>
+	</bean>
+	
+	
+	<bean  id="dynamicDataSource" class="com.nicomama.datasource.DynamicDataSource">
+		<property name="dataSourceMap">
+			<map>
+				<entry key="dataSource_0" value-ref="dataSource_0"/>
+				<entry key="dataSource_1" value-ref="dataSource_1"/>
+			</map>
+		</property>
+		<property name="defaultDataSource" ref="dataSource_1"/>
+	</bean>
+	
 	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-		<property name="dataSource" ref="dataSource" />
+		<property name="dataSource" ref="dynamicDataSource" />
 		<property name="configLocation" value="classpath:sqlMapConfig.xml"></property>
 		<property name="mapperLocations" value="classpath:mapper/mysql/**/*Mapper.xml"></property>
 	</bean>
 
 	<!-- 使用JDBC事物 -->
 	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-		<property name="dataSource" ref="dataSource" />
+		<property name="dataSource" ref="dynamicDataSource" />
 	</bean>
 	
 	
@@ -113,7 +166,7 @@
 	<aop:config>
         <aop:pointcut id="transactionPointcut" expression="execution(* com.ultra..service.*.*(..))"/>
         <aop:advisor pointcut-ref="transactionPointcut" advice-ref="transactionAdvice"/>
-    </aop:config>
+    </aop:config> 
     
 	<!-- 注解事物 -->
 	<tx:annotation-driven transaction-manager="transactionManager" />
@@ -124,10 +177,14 @@
 	</bean>
 	
 	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
-		<property name="dataSource" ref="dataSource" />
+		<property name="dataSource" ref="dynamicDataSource" />
 	</bean>
 	<bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">	
 		<constructor-arg index="0" ref="sqlSessionFactory"/>
 	</bean>
 	
+	<!-- <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"/> -->
+	<bean id="pointcut" class ="com.nicomama.spring.RegexpMethodPointcutAdvisor">
+		<constructor-arg index="0" value="com.ultra.*.dao.*"/>
+	</bean>
 </beans>

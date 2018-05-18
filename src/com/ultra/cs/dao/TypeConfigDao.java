@@ -11,6 +11,9 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
+import com.nicomama.annotation.DSParam;
+import com.nicomama.annotation.DataSource;
+import com.ultra.DataSourceStrategyImpl;
 import com.ultra.cs.model.TypeConfig;
 
 /**
@@ -37,23 +40,27 @@ public interface TypeConfigDao {
      * 添加
      * @param config
      */
-    public void insert(TypeConfig config);
+    @DataSource(strategy = DataSourceStrategyImpl.class)
+    public void insert(@DSParam TypeConfig config);
 
     /**
      * 更新
      * @param config
      */
+    @DataSource("dataSource_0")
     public void update(TypeConfig config);
 
     /**
      * 删除
      * @param id
      */
-    public void delete(@Param("id") Long id, @Param("name") String name);
+    @DataSource(strategy = DataSourceStrategyImpl.class)
+    public void delete(@DSParam @Param("id") Long id, @Param("name") String name);
 
     /**
      * 查询类别
      * @return
      */
+    @DataSource("dataSource_0")
     public List<TypeConfig> listType(Map<String, Object> params);
 }

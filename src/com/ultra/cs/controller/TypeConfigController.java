@@ -104,6 +104,7 @@ public class TypeConfigController {
     @RequestMapping("/test")
     public RespData<TypeConfig> test() {
         try {
+
             TypeConfig config = new TypeConfig();
             config.setId(id.incrementAndGet());
             config.setName("name:" + config.getId());
@@ -113,6 +114,7 @@ public class TypeConfigController {
         } catch (Exception e) {
             e.printStackTrace();
             return new RespData<>(500, e.getMessage(), null);
+        } finally {
         }
     }
 
