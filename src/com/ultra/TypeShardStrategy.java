@@ -33,7 +33,7 @@ public class TypeShardStrategy implements ShardStrategy {
     @Override
     public String parse(SqlParam sqlParam) {
         Long id = (Long) sqlParam.get("id");
-        return "_0";//返回分表的后缀
+        return "_" + id % 3;//返回分表的后缀
     }
 
 }

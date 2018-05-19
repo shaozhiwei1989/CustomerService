@@ -92,7 +92,7 @@ public class TypeConfigController {
         try {
             Map<String, Object> params = new HashMap<>();
             params.put("id", 5L);
-            List<TypeConfig> types = typeConfigService.list(params);
+            List<TypeConfig> types = typeConfigService.list(5L, params);
             return new PageData<TypeConfig>(200, types, -1, -1);
         } catch (Exception e) {
             e.printStackTrace();

@@ -58,7 +58,7 @@ public class TypeConfigServiceImpl implements TypeConfigService {
     }
 
     @Override
-    public List<TypeConfig> list(Map<String, Object> params) {
+    public List<TypeConfig> list(Long shardKey, Map<String, Object> params) {
         return typeConfigDao.listType(params);
     }
 

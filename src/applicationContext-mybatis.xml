@@ -21,16 +21,12 @@
     </bean>
 
     <bean id="stat-filter" class="com.alibaba.druid.filter.stat.StatFilter">
-<!--         慢SQL统计，如果SQL执行时间超过一定时间则记录为慢SQL  -->
         <property name="slowSqlMillis" value="3000" />
-<!--         慢SQL统计日志输出  -->
         <property name="logSlowSql" value="true" />
-<!--         合并SQL统计 例如select * from table t where t.id =1，会被变为select * from table t where t.id =？来统计  -->
         <property name="mergeSql" value="true" />
     </bean>
 
     <bean id="wall-filter-config" class="com.alibaba.druid.wall.WallConfig" init-method="init">
-<!--         指定配置装载的目录  -->
         <property name="dir" value="META-INF/druid/wall" />
         <property name="selectWhereAlwayTrueCheck" value="false" />
         <property name="selectHavingAlwayTrueCheck" value="false" />
@@ -40,19 +36,10 @@
         <property name="dbType" value="${jdbc.dbType}" />
         <property name="config" ref="wall-filter-config" />
     </bean>
-	
-	
-	<bean id="dataSource_0" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
-		<property name="driverClassName" value="${jdbc.driver}" />
-		<!-- 设置JDBC连接URL -->
-		<property name="url" value="${jdbc.url}" />
-	
-		<!-- 设置数据库用户名 -->
-		<property name="username" value="${jdbc.username}" />
-		<!-- 设置数据库密码 -->
-		<property name="password" value="${jdbc.password}" />
-
-		<!-- 初始化时获取的连接数，取值应在minPoolSize与maxPoolSize之间。Default: 3 -->
+    
+    
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" abstract="true" init-method="init" destroy-method="close">
+    		<!-- 初始化时获取的连接数，取值应在minPoolSize与maxPoolSize之间。Default: 3 -->
 		<property name="initialSize" value="${jdbc.initialSize}" />
 
 		<!-- 连接池中保留的最小连接数 -->
@@ -81,59 +68,40 @@
                 <ref bean="log-filter" />
             </list>
         </property>
+    </bean>
+	
+	<bean id="dataSource_0" class="com.alibaba.druid.pool.DruidDataSource" parent="dataSource">
+		<property name="driverClassName" value="${jdbc0.driver}" />
+		<!-- 设置JDBC连接URL -->
+		<property name="url" value="${jdbc0.url}" />
+	
+		<!-- 设置数据库用户名 -->
+		<property name="username" value="${jdbc0.username}" />
+		<!-- 设置数据库密码 -->
+		<property name="password" value="${jdbc0.password}" />
 	</bean>
 	
 	
-	<bean id="dataSource_1" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
-		<property name="driverClassName" value="${jdbc2.driver}" />
+	<bean id="dataSource_1" class="com.alibaba.druid.pool.DruidDataSource" parent="dataSource">
+		<property name="driverClassName" value="${jdbc1.driver}" />
 		<!-- 设置JDBC连接URL -->
-		<property name="url" value="${jdbc2.url}" />
+		<property name="url" value="${jdbc1.url}" />
 	
 		<!-- 设置数据库用户名 -->
-		<property name="username" value="${jdbc2.username}" />
+		<property name="username" value="${jdbc1.username}" />
 		<!-- 设置数据库密码 -->
-		<property name="password" value="${jdbc2.password}" />
-
-		<!-- 初始化时获取的连接数，取值应在minPoolSize与maxPoolSize之间。Default: 3 -->
-		<property name="initialSize" value="${jdbc2.initialSize}" />
-
-		<!-- 连接池中保留的最小连接数 -->
-		<property name="minIdle" value="${jdbc2.minIdle}" />
-
-		<!-- 连接池中保留的最大连接数。Default: 15 -->
-		<property name="maxActive" value="${jdbc2.maxActive}" />
-
-		<!-- 最大空闲时间,36000秒(10小时)内未使用则连接被丢弃。若为0则永不丢弃。Default: 0 -->
-		<property name="timeBetweenEvictionRunsMillis" value="${jdbc2.timeBetweenEvictionRunsMillis}" />
-		<property name="minEvictableIdleTimeMillis" value="${jdbc2.minEvictableIdleTimeMillis}" />
-		<property name="validationQuery" value="SELECT 1" />
-		<property name="testWhileIdle" value="true" />
-		
-		<property name="poolPreparedStatements" value="true" />
-		<property name="removeAbandoned" value="true" />
-        <!-- 超时时间；单位为秒。180秒=3分钟 -->
-        <property name="removeAbandonedTimeout" value="${jdbc.removeAbandonedTimeout}" />
-        <!-- 关闭abanded连接时输出错误日志 -->
-        <property name="logAbandoned" value="true" />
-	    
-        <property name="proxyFilters">
-            <list>
-                <ref bean="stat-filter" />
-                <ref bean="wall-filter" />
-                <ref bean="log-filter" />
-            </list>
-        </property>
+		<property name="password" value="${jdbc1.password}" />
 	</bean>
 	
 	
 	<bean  id="dynamicDataSource" class="com.nicomama.datasource.DynamicDataSource">
+		<property name="defaultDataSource" ref="dataSource_1"/>
 		<property name="dataSourceMap">
 			<map>
 				<entry key="dataSource_0" value-ref="dataSource_0"/>
 				<entry key="dataSource_1" value-ref="dataSource_1"/>
 			</map>
 		</property>
-		<property name="defaultDataSource" ref="dataSource_1"/>
 	</bean>
 	
 	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
@@ -148,8 +116,8 @@
 	</bean>
 	
 	
-	<!-- AOP配置事物 -->
-	<tx:advice id="transactionAdvice" transaction-manager="transactionManager">
+	 
+	<!--<tx:advice id="transactionAdvice" transaction-manager="transactionManager">
 		<tx:attributes>
 			<tx:method name="query*" read-only="true" propagation="REQUIRED" />
 			<tx:method name="list*" read-only="true" propagation="REQUIRED" />
@@ -162,12 +130,12 @@
 		</tx:attributes>
 	</tx:advice>
 	
-	<!-- 配置AOP切面 -->
+	
 	<aop:config>
         <aop:pointcut id="transactionPointcut" expression="execution(* com.ultra..service.*.*(..))"/>
         <aop:advisor pointcut-ref="transactionPointcut" advice-ref="transactionAdvice"/>
-    </aop:config> 
-    
+    </aop:config> -->
+     
 	<!-- 注解事物 -->
 	<tx:annotation-driven transaction-manager="transactionManager" />
 	
@@ -183,7 +151,7 @@
 		<constructor-arg index="0" ref="sqlSessionFactory"/>
 	</bean>
 	
-	<!-- <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"/> -->
+	<bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"/>
 	<bean id="pointcut" class ="com.nicomama.spring.RegexpMethodPointcutAdvisor">
 		<constructor-arg index="0" value="com.ultra.*.dao.*"/>
 	</bean>

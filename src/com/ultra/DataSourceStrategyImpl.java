@@ -6,8 +6,8 @@
  */
 package com.ultra;
 
+import com.nicomama.parser.DSParam;
 import com.nicomama.strategy.DataSourceStrategy;
-import com.ultra.cs.model.TypeConfig;
 
 /**
  * <p>
@@ -31,15 +31,12 @@ import com.ultra.cs.model.TypeConfig;
 public class DataSourceStrategyImpl implements DataSourceStrategy {
 
     @Override
-    public String parse(Object[] args) {
-        if (args[0] instanceof TypeConfig) {
-            TypeConfig typeConfig = (TypeConfig) args[0];
-            return "dataSource_" + typeConfig.getId() % 2;
-        } else if (args[0] instanceof Long) {
-            Long id = (Long) args[0];
-            return "dataSource_" + id % 2;
+    public String parse(DSParam dsParam) {
+        Long id = (Long) dsParam.get("id");
+        if (id == null) {
+            return null;
         }
-        return null;
+        return "dataSource_" + id % 2;//返回分表的后缀
     }
 
 }

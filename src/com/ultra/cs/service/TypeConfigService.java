@@ -49,6 +49,6 @@ public interface TypeConfigService {
      */
     public void delete(Long id);
 
-    public List<TypeConfig> list(Map<String, Object> params);
+    public List<TypeConfig> list(Long shardKey, Map<String, Object> params);
 
 }
